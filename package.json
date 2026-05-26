@@ -1,0 +1,18 @@
+{
+  "name": "braze-campaign-auto-setting",
+  "version": "1.0.0",
+  "description": "Google Sheet 기반 Braze 푸시 캠페인 자동 Draft 생성 도구",
+  "main": "src/scheduler.js",
+  "scripts": {
+    "start": "node src/scheduler.js",
+    "save-session": "node scripts/save-session.js",
+    "test:sheets": "node src/sheets.js",
+    "test:braze": "node src/braze.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "googleapis": "^144.0.0",
+    "node-cron": "^3.0.3",
+    "playwright": "^1.44.0"
+  }
+}

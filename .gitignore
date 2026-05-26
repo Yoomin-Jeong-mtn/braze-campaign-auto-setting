@@ -1,0 +1,8 @@
+node_modules/
+.env
+credentials.json
+.chromium-profile/
+*.log
+logs/
+session.json
+.DS_Store
