@@ -7,15 +7,15 @@ const SEGMENT_SHEET_NAME = '세그먼트별 템플릿 캠페인 id';
 
 const COL = {
   STATUS: 0,
-  SEGMENT: 1,
-  CAMPAIGN_NAME: 2,
-  TITLE: 3,
-  BODY: 4,
-  DEEPLINK: 5,
-  ANDROID_IMAGE: 6,
-  IOS_IMAGE: 7,
-  SEND_TIME: 8,
-  SEND_DATE: 9,
+  SEND_TIME: 1,
+  SEND_DATE: 2,
+  BROADCAST_NO: 3,
+  CAMPAIGN_NAME: 4,
+  TITLE: 5,
+  BODY: 6,
+  SEGMENT: 7,
+  ANDROID_IMAGE: 8,
+  IOS_IMAGE: 9,
   BRAZE_URL: 10,
   ERROR_REASON: 11,
   UPDATED_AT: 12,
@@ -46,11 +46,13 @@ function getDatesToProcess() {
   tomorrow.setDate(today.getDate() + 1);
   const dates = [formatDate(tomorrow)];
 
-  // 금요일이면 일요일(모레)도 함께 처리
+  // 금요일이면 토+일+월 함께 처리
   if (dayOfWeek === 5) {
-    const sunday = new Date(today);
-    sunday.setDate(today.getDate() + 2);
-    dates.push(formatDate(sunday));
+    for (let i = 2; i <= 3; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dates.push(formatDate(d));
+    }
   }
 
   return dates;
@@ -115,7 +117,7 @@ async function getCampaignsToProcess() {
       campaignName: row[COL.CAMPAIGN_NAME]?.trim() || '',
       title: row[COL.TITLE]?.trim() || '',
       body: row[COL.BODY]?.trim() || '',
-      deeplink: row[COL.DEEPLINK]?.trim() || '',
+      broadcastNo: row[COL.BROADCAST_NO]?.trim() || '',
       androidImage: row[COL.ANDROID_IMAGE]?.trim() || '',
       iosImage: row[COL.IOS_IMAGE]?.trim() || '',
       sendTime: normalizeTime(row[COL.SEND_TIME]),

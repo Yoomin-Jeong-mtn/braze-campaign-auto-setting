@@ -42,6 +42,7 @@ async function editCampaign(campaignData) {
 
   const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
     headless: false,
+    args: ['--window-position=10000,10000'],
   });
   const page = await context.newPage();
 
@@ -71,16 +72,20 @@ async function editCampaign(campaignData) {
     await page.waitForTimeout(1000);
 
     // 제목: 고정 prefix + 시트 제목
-    const formattedTitle = '{{content_blocks.${push_setting}}}(광고) ' + campaignData.title;
+    const formattedTitle = '{{content_blocks.${push_setting}}}' + campaignData.title;
     await fillMonaco(page, monacoByTextareaId(page, 'quick-push-title'), formattedTitle);
 
-    // 본문: 광고 표시 + 시트 본문 + 수신거부 문구
-    const formattedBody = '(광고) ' + campaignData.body + '\n*수신거부:설정>알림설정';
-    await fillMonaco(page, monacoByTextareaId(page, 'quick-push-message'), formattedBody);
+    const formattedBody = campaignData.body
+      ? '(광고) ' + campaignData.body + '\n*수신거부:설정>알림설정'
+      : '';
+    if (formattedBody) {
+      await fillMonaco(page, monacoByTextareaId(page, 'quick-push-message'), formattedBody);
+    }
 
-    // 딥링크
-    if (campaignData.deeplink) {
-      await fillMonaco(page, monacoByTextareaId(page, 'onclick-behavior-input'), campaignData.deeplink);
+    // 딥링크 (방송번호로 조립)
+    if (campaignData.broadcastNo) {
+      const deeplink = 'elevenst://loadurl?domain=m.11st.co.kr?&XSITE=1001788537&url=https%3A%2F%2Fm.11st.co.kr%2FMW%2FGate%2FliveBroadcastGate.tmall%3FbroadcastNo%3D' + campaignData.broadcastNo;
+      await fillMonaco(page, monacoByTextareaId(page, 'onclick-behavior-input'), deeplink);
     }
 
     // iOS 이미지
@@ -123,6 +128,8 @@ async function editCampaign(campaignData) {
     await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     await page.getByRole('button', { name: 'Step Review', exact: true }).click();
     await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Save Draft' }).click();
     await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
 
